@@ -37,7 +37,7 @@ export default function DraggableBottle() {
 
   useEffect(() => {
     try { localStorage.setItem('bottle-pos', JSON.stringify(pos)) } catch {}
-    const detail = { x: pos.x, y: pos.y, width: 72, height: 216 }
+    const detail = { x: pos.x, y: pos.y, width: 56, height: 160 }
     window.dispatchEvent(new CustomEvent('bottle:move', { detail }))
   }, [pos])
 
@@ -52,11 +52,14 @@ export default function DraggableBottle() {
     window.addEventListener('pointermove', onMove)
     window.addEventListener('pointerup', onUp)
     const onFilled = () => setHidden(true)
+    const onEmptied = () => setHidden(false)
     window.addEventListener('glass:filled', onFilled)
+    window.addEventListener('glass:emptied', onEmptied)
     return () => {
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerup', onUp)
       window.removeEventListener('glass:filled', onFilled)
+      window.removeEventListener('glass:emptied', onEmptied)
     }
   }, [dragging, offset])
 
@@ -77,7 +80,7 @@ export default function DraggableBottle() {
         setOffset({ x: ox, y: oy })
       }}
       style={{ left: pos.x, top: pos.y }}
-      className="absolute z-[9998] w-18 h-54 cursor-grab active:cursor-grabbing select-none"
+      className="absolute z-[9998] w-14 md:w-18 h-40 md:h-54 cursor-grab active:cursor-grabbing select-none"
     >
       <img src={bottleUrl} alt="Bouteille de martini" className="w-full h-full object-contain" draggable={false} />
     </div>

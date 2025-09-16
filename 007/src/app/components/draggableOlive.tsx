@@ -22,7 +22,7 @@ export default function DraggableOlive() {
     try {
       localStorage.setItem('olive-pos', JSON.stringify(pos))
     } catch {}
-    const detail = { x: pos.x, y: pos.y, width: 40, height: 40 }
+    const detail = { x: pos.x, y: pos.y, width: 32, height: 32 }
     window.dispatchEvent(new CustomEvent('olive:move', { detail }))
   }, [pos])
 
@@ -40,11 +40,16 @@ export default function DraggableOlive() {
     const onFilled = () => {
       setHidden(true)
     }
+    const onEmptied = () => {
+      setHidden(false)
+    }
     window.addEventListener('glass:filled', onFilled)
+    window.addEventListener('glass:emptied', onEmptied)
     return () => {
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerup', onUp)
       window.removeEventListener('glass:filled', onFilled)
+      window.removeEventListener('glass:emptied', onEmptied)
     }
   }, [dragging, offset])
 
@@ -66,7 +71,7 @@ export default function DraggableOlive() {
         setOffset({ x: ox, y: oy })
       }}
       style={{ left: pos.x, top: pos.y }}
-      className="absolute z-[9999] w-10 h-10 cursor-grab active:cursor-grabbing select-none"
+      className="absolute z-[9999] w-8 md:w-10 h-8 md:h-10 cursor-grab active:cursor-grabbing select-none"
     >
       <img src={oliveUrl} alt="Olive" className="w-full h-full object-contain" draggable={false} />
     </div>

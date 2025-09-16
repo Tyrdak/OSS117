@@ -11,14 +11,14 @@ import Reset from '../components/reset'
 export default function Landing() {
   return (
     <div className="min-h-screen bg-black text-white" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-      <div className="max-w-7xl mx-auto px-6">
-        <header className="flex items-center justify-between py-6">
-          <div className="flex items-center gap-4">
+      <div className="max-w-7xl mx-auto px-4 md:px-6">
+        <header className="flex items-center justify-between py-4 md:py-6 px-4 md:px-0">
+          <div className="flex items-center gap-2 md:gap-4">
             <StationaryGlass mode="header" />
-            <h1 className="text-3xl tracking-widest">AGENT <span className='text-yellow-600'>007</span></h1>
+            <h1 className="text-xl md:text-3xl tracking-widest">AGENT <span className='text-yellow-600'>007</span></h1>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="opacity-60 text-sm">Fan Page</div>
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="opacity-60 text-xs md:text-sm mobile-hidden">Fan Page</div>
             <Reset />
           </div>
         </header>

@@ -18,10 +18,18 @@ export default function StationaryGlass({ mode = 'overlay' }: { mode?: Mode }) {
   })
 
   useEffect(() => {
+    // Nécessite OLIVE ET BOUTEILLE pour débloquer
     if (oliveOver && bottleOver && !filled) {
       setFilled(true)
       try { localStorage.setItem('glass-filled', 'true') } catch {}
       window.dispatchEvent(new Event('glass:filled'))
+    } else if (!oliveOver || !bottleOver) {
+      // Si l'olive ou la bouteille n'est plus dans le verre, on reset
+      if (filled) {
+        setFilled(false)
+        try { localStorage.removeItem('glass-filled') } catch {}
+        window.dispatchEvent(new Event('glass:emptied'))
+      }
     }
   }, [oliveOver, bottleOver, filled])
 
@@ -73,7 +81,7 @@ export default function StationaryGlass({ mode = 'overlay' }: { mode?: Mode }) {
   if (mode === 'header') {
     return (
       <div className="relative flex items-center select-none">
-        <div ref={ref} className="relative w-20 h-20" aria-label="verre">
+        <div ref={ref} className="relative w-16 md:w-20 h-16 md:h-20" aria-label="verre">
           <img src={glassEmptyUrl} alt="Verre" className="absolute inset-0 w-full h-full object-contain" draggable={false} />
           <img
             src={glassFullUrl}
@@ -84,7 +92,7 @@ export default function StationaryGlass({ mode = 'overlay' }: { mode?: Mode }) {
           />
         </div>
         {filled && (
-          <a href="#/control" className="ml-3">
+          <a href="#/control" className="ml-3 animate-fadeIn">
             <Button size="sm">QG secret</Button>
           </a>
         )}
@@ -94,7 +102,7 @@ export default function StationaryGlass({ mode = 'overlay' }: { mode?: Mode }) {
 
   return (
     <div className="relative">
-      <div ref={ref} className="absolute left-8 bottom-8 w-20 h-24 select-none" aria-label="verre">
+      <div ref={ref} className="absolute left-4 md:left-8 bottom-4 md:bottom-8 w-16 md:w-20 h-20 md:h-24 select-none" aria-label="verre">
         <img src={glassEmptyUrl} alt="Verre" className="absolute inset-0 w-full h-full object-contain" draggable={false} />
         <img
           src={glassFullUrl}
@@ -106,7 +114,7 @@ export default function StationaryGlass({ mode = 'overlay' }: { mode?: Mode }) {
       </div>
 
       {filled && (
-        <div className="absolute left-8 bottom-56">
+        <div className="absolute left-4 md:left-8 bottom-48 md:bottom-56 animate-fadeIn">
           <a href="#/control">
             <Button size="lg">Accéder au QG secret</Button>
           </a>

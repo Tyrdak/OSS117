@@ -3,3 +3,36 @@
 body {
     font-family: 'Montserrat', sans-serif;
 }
+
+/* Animation pour l'apparition du bouton QG secret */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Améliorations responsive */
+@media (max-width: 768px) {
+    .mobile-hidden {
+        display: none !important;
+    }
+    
+    .mobile-stack {
+        flex-direction: column !important;
+        gap: 1rem !important;
+    }
+    
+    .mobile-full {
+        width: 100% !important;
+        max-width: none !important;
+    }
+}
