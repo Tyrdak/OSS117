@@ -26,7 +26,12 @@ Système de surveillance en temps réel pour Raspberry Pi avec coordonnées GPS,
 npm install --legacy-peer-deps
 ```
 
-### 2. Variables d'environnement Vercel
+### 2. Variables d'environnement (front)
+Crée `.env.local` à la racine de `007/` avec:
+```
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_ANON_KEY=...
+```
 ```
 SUPABASE_URL=your_supabase_url
 SUPABASE_SERVICE_ROLE=your_service_role_key
