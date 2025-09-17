@@ -83,11 +83,9 @@ export default function Dashboard() {
       // Pour life: on garde l'appel direct au Raspberry local
       let url = ''
       if (endpoint === 'loc') {
-        url = 'https://lescagoles.fr/loc'
+        url = 'https://freedom-every-suites-tracy.trycloudflare.com/loc/'
       } else {
-        const ip = selectedIp.trim()
-        if (!ip) throw new Error('IP manquante pour ce Raspberry')
-        url = `http://${ip}:8000/${endpoint}/`
+        url = `https://freedom-every-suites-tracy.trycloudflare.com/life/`
       }
       const res = await fetch(url, { method: 'GET' })
       const ct = res.headers.get('content-type') || ''
