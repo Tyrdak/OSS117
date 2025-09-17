@@ -3,6 +3,7 @@ import express from "express";
 import fs from "fs";
 import path from "path";
 import bodyParser from "body-parser";
+import fetch from "node-fetch";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,6 +15,45 @@ const LOG = path.join(process.cwd(), "logs.txt");
 // Middlewares
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// --- Dev proxy for lescagoles.fr ---
+app.use(async (req, res, next) => {
+  if (!req.path.startsWith('/lescagoles/')) return next();
+  try {
+    const sub = req.path.replace(/^\/lescagoles\//, '');
+    const target = `https://lescagoles.fr/${sub}`.replace(/\/+$/, '/');
+    const upstream = await fetch(target, {
+      method: req.method,
+      headers: {
+        'content-type': req.headers['content-type'] || undefined,
+      },
+      body: ['GET','HEAD'].includes(req.method) ? undefined : req.body,
+      redirect: 'manual',
+    });
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    if (req.method === 'OPTIONS') return res.status(204).end();
+
+    if ([301,302,303,307,308].includes(upstream.status)) {
+      const loc = upstream.headers.get('location');
+      if (loc) {
+        const u = new URL(loc, 'https://lescagoles.fr');
+        const newLoc = `/lescagoles${u.pathname}${u.search || ''}`;
+        return res.status(302).setHeader('location', newLoc).end();
+      }
+    }
+
+    const ct = upstream.headers.get('content-type') || 'text/plain; charset=utf-8';
+    res.status(upstream.status).setHeader('content-type', ct);
+    const buf = Buffer.from(await upstream.arrayBuffer());
+    return res.end(buf);
+  } catch (e) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    return res.status(502).json({ ok: false, error: e instanceof Error ? e.message : String(e) });
+  }
+});
 
 // --- API: POST ingest ---
 app.post("/ingest", (req, res) => {

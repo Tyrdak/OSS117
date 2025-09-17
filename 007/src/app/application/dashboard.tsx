@@ -79,9 +79,16 @@ export default function Dashboard() {
       setProbeError("")
       if (endpoint === 'life') setLifeOnline(null)
       if (endpoint === 'loc') setLocCoords(null)
-      const ip = selectedIp.trim()
-      if (!ip) throw new Error('IP manquante pour ce Raspberry')
-      const url = `http://${ip}:8000/${endpoint}/`
+      // Pour loc: simple fetch vers lescagoles.fr/loc/
+      // Pour life: on garde l'appel direct au Raspberry local
+      let url = ''
+      if (endpoint === 'loc') {
+        url = 'https://lescagoles.fr/loc/'
+      } else {
+        const ip = selectedIp.trim()
+        if (!ip) throw new Error('IP manquante pour ce Raspberry')
+        url = `http://${ip}:8000/${endpoint}/`
+      }
       const res = await fetch(url, { method: 'GET' })
       const ct = res.headers.get('content-type') || ''
       if (endpoint === 'life') {
@@ -104,8 +111,13 @@ export default function Dashboard() {
         try {
           if (ct.includes('application/json')) {
             const j = await res.json()
-            lat = parseFloat(j.lat ?? j.latitude)
-            lon = parseFloat(j.lon ?? j.lng ?? j.longitude)
+            if (typeof j?.loc === 'string') {
+              const m = j.loc.match(/(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)/)
+              if (m) { lat = parseFloat(m[1]); lon = parseFloat(m[2]) }
+            } else {
+              lat = parseFloat(j.lat ?? j.latitude)
+              lon = parseFloat(j.lon ?? j.lng ?? j.longitude)
+            }
           } else {
             const t = await res.text()
             const m = t.match(/(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)/)
@@ -209,7 +221,7 @@ export default function Dashboard() {
               </button>
               <button
                 onClick={() => probe('loc')}
-                disabled={probeLoading || !selectedIp}
+                disabled={probeLoading}
                 className={`px-3 py-2 rounded border border-white/20 text-sm ${probeLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/10'}`}
               >
                 Demander position (loc)
