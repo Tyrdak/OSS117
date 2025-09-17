@@ -28,25 +28,24 @@ export default async function handler(req, res) {
     const host = body.Host || body.host || body.device || "unknown";
     const rawDate = body.date || body.ts || null;
     
-    // Coordonnées GPS
-    const latitude = parseFloat(body.lat || body.latitude || body.Lat || body.Latitude);
-    const longitude = parseFloat(body.lon || body.longitude || body.Lon || body.Longitude);
+    // Coordonnées GPS (supporte lat/lon séparés OU champ unique "loc" => "lat,lon")
+    let latitude = parseFloat(body.lat || body.latitude || body.Lat || body.Latitude);
+    let longitude = parseFloat(body.lon || body.longitude || body.Lon || body.Longitude);
+    if ((isNaN(latitude) || isNaN(longitude)) && typeof body.loc === "string") {
+      const m = body.loc.trim().match(/(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)/);
+      if (m) {
+        latitude = parseFloat(m[1]);
+        longitude = parseFloat(m[2]);
+      }
+    }
     const altitude = parseFloat(body.alt || body.altitude || body.Alt || body.Altitude);
     const gpsAccuracy = parseFloat(body.accuracy || body.gps_accuracy || body.Accuracy);
     
-    // Date du message (par le Raspberry Pi)
-    let messageDate = null;
-    if (rawDate) {
-      try {
-        // Essayer de parser la date brute du Raspberry Pi
-        const parsedDate = new Date(rawDate);
-        if (!isNaN(parsedDate.getTime())) {
-          messageDate = parsedDate.toISOString();
-        }
-      } catch (e) {
-        // Si parsing échoue, on garde null
-      }
-    }
+    // Date/heure côté serveur (réception) — on force l'horodatage ici
+    const now = new Date();
+    const nowIso = now.toISOString();
+    // Pour répondre à la demande, on stocke la date serveur dans message_date
+    const messageDate = nowIso;
     
     const ip =
       (req.headers["x-forwarded-for"] || "").toString().split(",")[0].trim() ||
@@ -56,7 +55,7 @@ export default async function handler(req, res) {
     // Générer un ID unique pour le Raspberry Pi basé sur l'IP ou host
     const raspberryId = `rpi-${ip.replace(/\./g, '-')}`;
 
-    const nowIso = new Date().toISOString();
+    // nowIso déjà calculé ci-dessus
 
     const payload = {
       raspberry_id: raspberryId,
