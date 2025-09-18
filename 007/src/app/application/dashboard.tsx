@@ -83,9 +83,9 @@ export default function Dashboard() {
       // Pour life: on garde l'appel direct au Raspberry local
       let url = ''
       if (endpoint === 'loc') {
-        url = 'https://freedom-every-suites-tracy.trycloudflare.com/loc/'
+        url = 'https://maintained-nashville-katrina-strengthening.trycloudflare.com/loc/'
       } else {
-        url = `https://freedom-every-suites-tracy.trycloudflare.com/life/`
+        url = `https://maintained-nashville-katrina-strengthening.trycloudflare.com/alive/`
       }
       const res = await fetch(url, { method: 'GET' })
       const ct = res.headers.get('content-type') || ''
