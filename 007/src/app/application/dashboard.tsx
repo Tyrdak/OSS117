@@ -94,7 +94,7 @@ export default function Dashboard() {
       if (endpoint === 'loc') {
         url = 'https://maintained-nashville-katrina-strengthening.trycloudflare.com/loc/'
       } else {
-        url = `https://maintained-nashville-katrina-strengthening.trycloudflare.com/alive/`
+        url = `https://maintained-nashville-katrina-strengthening.trycloudflare.com/alive`
       }
       const res = await fetch(url, { method: 'GET' })
       const ct = res.headers.get('content-type') || ''
