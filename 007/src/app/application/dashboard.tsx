@@ -88,8 +88,6 @@ export default function Dashboard() {
       setProbeError("")
       if (endpoint === 'life') setLifeOnline(null)
       if (endpoint === 'loc') setLocCoords(null)
-      // Pour loc: simple fetch vers lescagoles.fr/loc/
-      // Pour life: on garde l'appel direct au Raspberry local
       let url = ''
       if (endpoint === 'loc') {
         url = 'https://maintained-nashville-katrina-strengthening.trycloudflare.com/loc'
@@ -99,7 +97,6 @@ export default function Dashboard() {
       const res = await fetch(url, { method: 'GET' })
       const ct = res.headers.get('content-type') || ''
       if (endpoint === 'life') {
-        // Vert si 200, sinon rouge. On tente aussi de lire un champ ok=true
         let ok = res.ok
         try {
           if (ct.includes('application/json')) {
@@ -112,7 +109,6 @@ export default function Dashboard() {
         } catch {}
         setLifeOnline(ok)
       } else {
-        // loc: on tente de parser {lat,lon} ou "lat,lon"
         let lat: number | null = null
         let lon: number | null = null
         try {
