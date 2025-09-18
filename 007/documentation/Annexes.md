@@ -4,7 +4,7 @@
 
 ---
 
-## 📐 Schéma des talons avant impression
+## 📐 Schéma des talons avant impression et câblage PIR → Raspberry Pi
 ![Schéma talon 1](assets/IMG_20250916_140754.webp)  
 ![Schéma talon 2](assets/IMG_20250916_140801.webp)
 
@@ -27,40 +27,25 @@
 
 ---
 
-## 🔌 Schéma câblage PIR → Raspberry Pi
-*(à compléter)*
+## 📚 Ressources utilisées
+🛠️ Outils et plateformes
+- 	circuito.io – Application de conception de circuits pour makers
+- 	Arduino IDE – Environnement de développement pour la phase initiale
+- 	Maya & Creality – Modélisation et impression 3D
+- 	GitHub – Gestion de version
+- 	Documentation officielle – Supabase, NextJS, React, Vercel, etc.
 
----
+🐍 Librairies Python
+- 	gpiozero – Pour le capteur PIR
+- 	RPi.GPIO – Pour le Raspberry Pi
+- 	requests – Pour l’envoi de requêtes HTTP
 
-# ✅ Annexes complémentaires
-
-### 📋 Checklist Démo
-- [x] Prototype alimenté (batterie portable testée)  
-- [x] Capteur PIR câblé et fixé  
-- [x] Script Python fonctionnel  
-- [x] Connexion Wi-Fi MyDil OK  
-- [x] Site web accessible  
-- [x] Envoi JSON avec timestamp validé  
-- [x] Journalisation locale activée  
-- [x] Vidéo de démo prête  
-- [x] Slides prêtes  
-- [ ] Timelapse finalisé  
-- [x] Aplatir la porte de la batterie avec un tournevis chauffé pour ouvrir/fermer sans problème  
-
----
-
-# 📚 Ressources utilisées
-- [Circuit Design App for Makers - circuito.io](https://www.circuito.io "Circuito")  
-- Librairie Python `gpiozero` pour le PIR  
-- Maya et Creality pour la modélisation 3D  
-
----
-
-## ⚙️ Stack Technique
-
-| 💻 Composant     | 🔧 Technologie             |
-| ---------------- | -------------------------- |
-| Site web front   | React TS, Tailwind CSS, Vite |
-| API              | NextJS                     |
-| Base de données  | Supabase                   |
-| Hébergement      | Vercel                     |
+☁️ Hébergement & Backend
+- 	Supabase – Hébergement et base de données cloud
+- 	Vercel – Hébergement du site web
+ 
+💻 Frameworks & Frontend
+- 	NextJS – Framework API et dashboard
+- 	React – Framework frontend
+- 	Tailwind CSS – Framework UI
+- 	Vite – Outil de build et développement frontend
