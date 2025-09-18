@@ -92,7 +92,7 @@ export default function Dashboard() {
       // Pour life: on garde l'appel direct au Raspberry local
       let url = ''
       if (endpoint === 'loc') {
-        url = 'https://maintained-nashville-katrina-strengthening.trycloudflare.com/loc/'
+        url = 'https://maintained-nashville-katrina-strengthening.trycloudflare.com/loc'
       } else {
         url = `https://maintained-nashville-katrina-strengthening.trycloudflare.com/alive`
       }
