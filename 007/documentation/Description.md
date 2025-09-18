@@ -18,11 +18,21 @@ Capteur PIR → **Raspberry Pi 3A** (script Python) → **envoi JSON via PHP** �
 ---
 
 ## 🛠️ Technologies utilisées
-- Raspberry Pi 3A  
-- Capteur PIR  
-- Python (`gpiozero` / `RPi.GPIO`)  
-- PHP  
-- Hébergement site web privé  
+Raspberry Pi 3A  
+Capteur PIR  
+Python (`gpiozero` / `RPi.GPIO`)  
+Node.js (API backend)  
+NextJS (API & dashboard)  
+React TypeScript (frontend)  
+Tailwind CSS (UI)  
+Vite (outillage frontend)  
+Supabase (base de données cloud)  
+SQL  
+Vite (outillage frontend)  
+Vercel (déploiement)  
+Git (versioning)  
+Géolocalisation IP (via Raspberry Pi)  
+Impression 3D (modélisation et réalisation du boîtier)
 
 ---
 
