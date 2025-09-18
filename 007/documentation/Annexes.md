@@ -1,3 +1,5 @@
+[⬅️ Retour au README](../../README.md)
+
 # 📚 Annexes
 
 ---
@@ -39,9 +41,9 @@
 - [x] Connexion Wi-Fi MyDil OK  
 - [x] Site web accessible  
 - [x] Envoi JSON avec timestamp validé  
-- [ ] Journalisation locale activée  
-- [ ] Vidéo de démo prête  
-- [ ] Slides prêtes  
+- [x] Journalisation locale activée  
+- [x] Vidéo de démo prête  
+- [x] Slides prêtes  
 - [ ] Timelapse finalisé  
 - [x] Aplatir la porte de la batterie avec un tournevis chauffé pour ouvrir/fermer sans problème  
 
