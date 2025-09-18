@@ -12,6 +12,7 @@ type MotionEvent = {
   gps_accuracy: number | null;
   host: string;
   ip_address: string;
+  url?: string | null;
   message_date: string | null;
   timestamp: string;
 }
@@ -23,6 +24,7 @@ export default function Dashboard() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [selectedRaspberry, setSelectedRaspberry] = useState<string>("")
   const [selectedIp, setSelectedIp] = useState<string>("")
+  const [selectedUrl, setSelectedUrl] = useState<string>("")
   const [probeLoading, setProbeLoading] = useState<boolean>(false)
   // Etat synthétique
   const [lifeOnline, setLifeOnline] = useState<boolean | null>(null)
@@ -43,7 +45,7 @@ export default function Dashboard() {
       setLoading(true)
       const { data, error } = await supabase
         .from('motions')
-        .select('id, raspberry_id, message, latitude, longitude, altitude, gps_accuracy, host, ip_address, message_date, timestamp')
+        .select('id, raspberry_id, message, latitude, longitude, altitude, gps_accuracy, host, ip_address, url, message_date, timestamp')
         .order('timestamp', { ascending: false })
         .limit(1000)
       if (error) throw new Error(error.message)
@@ -73,11 +75,13 @@ export default function Dashboard() {
     const arr = Array.from(latestByRpi.values()).map((m) => ({
       id: m.raspberry_id,
       ip: m.ip_address || '',
+      url: (m as any).url || ''
     }))
     // Sélection automatique du premier si rien
     if (!selectedRaspberry && arr.length > 0) {
       setSelectedRaspberry(arr[0].id)
       setSelectedIp(arr[0].ip)
+      setSelectedUrl(arr[0].url || '')
     }
     return arr
   }, [items, selectedRaspberry])
@@ -88,18 +92,13 @@ export default function Dashboard() {
       setProbeError("")
       if (endpoint === 'life') setLifeOnline(null)
       if (endpoint === 'loc') setLocCoords(null)
-      // Pour loc: simple fetch vers lescagoles.fr/loc/
-      // Pour life: on garde l'appel direct au Raspberry local
-      let url = ''
-      if (endpoint === 'loc') {
-        url = 'https://maintained-nashville-katrina-strengthening.trycloudflare.com/loc'
-      } else {
-        url = `https://maintained-nashville-katrina-strengthening.trycloudflare.com/alive`
-      }
-      const res = await fetch(url, { method: 'GET' })
+      const base = (selectedUrl || '').trim() || (selectedIp ? `http://${selectedIp}:8000` : '')
+      if (!base) throw new Error('Aucune base URL ni IP disponibles pour ce Raspberry')
+      const suffix = endpoint === 'loc' ? '/loc' : '/alive'
+      const requestUrl = `${base.replace(/\/$/, '')}${suffix}`
+      const res = await fetch(requestUrl, { method: 'GET' })
       const ct = res.headers.get('content-type') || ''
       if (endpoint === 'life') {
-        // Vert si 200, sinon rouge. On tente aussi de lire un champ ok=true
         let ok = res.ok
         try {
           if (ct.includes('application/json')) {
@@ -112,7 +111,6 @@ export default function Dashboard() {
         } catch {}
         setLifeOnline(ok)
       } else {
-        // loc: on tente de parser {lat,lon} ou "lat,lon"
         let lat: number | null = null
         let lon: number | null = null
         try {
@@ -217,6 +215,7 @@ export default function Dashboard() {
                   setSelectedRaspberry(id)
                   const found = raspberries.find(r => r.id === id)
                   setSelectedIp(found?.ip || '')
+                  setSelectedUrl(found?.url || '')
                 }}
                 className="mt-1 w-full bg-black/40 border border-white/10 rounded px-3 py-2 text-sm"
               >
@@ -224,6 +223,15 @@ export default function Dashboard() {
                   <option key={r.id} value={r.id}>{r.id}</option>
                 ))}
               </select>
+            </div>
+            <div className="w-full md:w-64">
+              <label className="text-xs text-white/60">Base URL (modifiable)</label>
+              <input
+                value={selectedUrl}
+                onChange={(e) => setSelectedUrl(e.target.value)}
+                placeholder="http://x.x.x.x:8000"
+                className="mt-1 w-full bg-black/40 border border-white/10 rounded px-3 py-2 text-sm"
+              />
             </div>
             <div className="w-full md:w-64">
               <label className="text-xs text-white/60">IP (modifiable)</label>
