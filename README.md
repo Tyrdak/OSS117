@@ -5,7 +5,7 @@ Système de surveillance en temps réel pour Raspberry Pi avec coordonnées GPS,
 ## 🕰️ Contexte
 Q – le cerveau légendaire derrière les gadgets de James Bond – vient de prendre une retraite bien méritée... ou de disparaître mystérieusement après avoir branché une clé USB dans une imprimante connectée à un grille-pain soviétique. Depuis, plus de gadgets, plus de café... et 007 menace d’utiliser un Windows Vista pour sa prochaine mission. Crise majeure au MI6. Q-Lab : l’héritage continue.
 
-## 🎯 [Objectifs](documentation/Objectifs.md)
+## 🎯 [Objectifs](007/documentation/Objectifs.md)
 
 Les nouvelles recrues du MyDil doivent prouver leur capacité à créer un gadget discret et fonctionnel à partir d’un Raspberry Pi.
 
@@ -19,7 +19,7 @@ Les nouvelles recrues du MyDil doivent prouver leur capacité à créer un gadge
 - **Coordonnées GPS précises** avec altitude et précision
 - **Mise à jour automatique** toutes les 5 secondes
 
-### 🗒️ [Description](documentation/Description.md)
+### 🗒️ [Description](007/documentation/Description.md)
 
 ### APIs
 - `POST /api/motion` - Réception des données des Raspberry Pi
@@ -170,7 +170,8 @@ npm run lint
 - [ ] Export des données
 - [ ] API de configuration à distance
 
-## [Annexes](007/documentation/Annexes.md)
+## [🧪 Compétences développées](007/documentation/Compétences%20développées.md)
+## [📚 Annexes](007/documentation/Annexes.md)
 
 ---
 
