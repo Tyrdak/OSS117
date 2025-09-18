@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import InteractiveMap from '../components/interactiveMap'
 
@@ -28,6 +28,15 @@ export default function Dashboard() {
   const [lifeOnline, setLifeOnline] = useState<boolean | null>(null)
   const [locCoords, setLocCoords] = useState<{ lat: number; lon: number } | null>(null)
   const [probeError, setProbeError] = useState<string>("")
+
+  // Filtres liste
+  const [filterDateFrom, setFilterDateFrom] = useState<string>("") // ISO date (yyyy-mm-dd)
+  const [filterDateTo, setFilterDateTo] = useState<string>("")
+  const [filterRaspberry, setFilterRaspberry] = useState<string>("")
+  const [filterHost, setFilterHost] = useState<string>("")
+  const [filtersOpen, setFiltersOpen] = useState<boolean>(false)
+  const dateFromRef = useRef<HTMLInputElement>(null)
+  const dateToRef = useRef<HTMLInputElement>(null)
 
   async function fetchItems() {
     try {
@@ -162,12 +171,28 @@ export default function Dashboard() {
     }))
   }, [items])
 
+  // Table filtrée
+  const filteredItems = useMemo(() => {
+    const fromTs = filterDateFrom ? new Date(filterDateFrom + 'T00:00:00').getTime() : -Infinity
+    const toTs = filterDateTo ? new Date(filterDateTo + 'T23:59:59').getTime() : Infinity
+    const rpi = filterRaspberry.trim().toLowerCase()
+    const host = filterHost.trim().toLowerCase()
+
+    return items.filter((m) => {
+      const ts = new Date(m.timestamp).getTime()
+      if (ts < fromTs || ts > toTs) return false
+      if (rpi && !String(m.raspberry_id).toLowerCase().includes(rpi)) return false
+      if (host && !(`${m.host} ${m.ip_address || ''}`.toLowerCase().includes(host))) return false
+      return true
+    })
+  }, [items, filterDateFrom, filterDateTo, filterRaspberry, filterHost])
+
   return (
     <div className="min-h-screen bg-black text-white" style={{ fontFamily: 'Montserrat, sans-serif' }}>
       <div className="max-w-6xl mx-auto px-6 py-10">
         <header className="flex items-center justify-between mb-6">
           <a href="#/" className="text-sm text-white/70 hover:text-white">← Retour</a>
-          <h1 className="text-xl tracking-widest">QG SECRET</h1>
+          <h1 className="text-xl tracking-widest">QG <span className='text-yellow-600'>SECRET</span></h1>
           <div className="flex items-center gap-3 text-xs text-white/60">
             {lastUpdated && <span>Maj: {lastUpdated.toLocaleTimeString()}</span>}
             <button
@@ -272,9 +297,94 @@ export default function Dashboard() {
 
             {/* Tableau des événements */}
             <div className="rounded-lg border border-white/10 bg-white/5 overflow-hidden">
+              {/* Bouton Filtres + panneau repliable */}
+              <div className="flex items-center justify-between px-4 pt-3 pb-3">
+                <button
+                  onClick={() => setFiltersOpen(v => !v)}
+                  className="px-3 py-1.5 rounded border border-white/20 text-xs hover:bg-white/10"
+                >
+                  {filtersOpen ? 'Masquer les filtres' : 'Filtres'}
+                </button>
+              </div>
+              {filtersOpen && (
+                <div className="px-4 pb-3 grid grid-cols-1 md:grid-cols-4 gap-3">
+                  <div>
+                    <label className="text-xs text-white/60">Date de début</label>
+                    <div className="mt-1 relative">
+                      <input
+                        ref={dateFromRef}
+                        type="date"
+                        value={filterDateFrom}
+                        onChange={(e) => setFilterDateFrom(e.target.value)}
+                        className="w-full bg-black/40 border border-white/10 rounded px-3 py-2 text-sm pr-9"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const el = dateFromRef.current
+                          if (!el) return
+                          const anyEl = el as unknown as { showPicker?: () => void }
+                          if (typeof anyEl.showPicker === 'function') anyEl.showPicker(); else el.focus()
+                        }}
+                        className="absolute inset-y-0 right-0 px-2 flex items-center text-white/70 hover:text-white"
+                        aria-label="Choisir la date de début"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                          <path d="M6 2a1 1 0 0 1 1 1v1h6V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 0 1 1-1Zm11 7H3v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9ZM3 8h14V6a1 1 0 0 0-1-1h-1v1a1 1 0 1 1-2 0V5H7v1a1 1 0 1 1-2 0V5H4a1 1 0 0 0-1 1v2Z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs text-white/60">Date de fin</label>
+                    <div className="mt-1 relative">
+                      <input
+                        ref={dateToRef}
+                        type="date"
+                        value={filterDateTo}
+                        onChange={(e) => setFilterDateTo(e.target.value)}
+                        className="w-full bg-black/40 border border-white/10 rounded px-3 py-2 text-sm pr-9"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const el = dateToRef.current
+                          if (!el) return
+                          const anyEl = el as unknown as { showPicker?: () => void }
+                          if (typeof anyEl.showPicker === 'function') anyEl.showPicker(); else el.focus()
+                        }}
+                        className="absolute inset-y-0 right-0 px-2 flex items-center text-white/70 hover:text-white"
+                        aria-label="Choisir la date de fin"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                          <path d="M6 2a1 1 0 0 1 1 1v1h6V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 0 1 1-1Zm11 7H3v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9ZM3 8h14V6a1 1 0 0 0-1-1h-1v1a1 1 0 1 1-2 0V5H7v1a1 1 0 1 1-2 0V5H4a1 1 0 0 0-1 1v2Z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs text-white/60">Raspberry (contient)</label>
+                    <input
+                      value={filterRaspberry}
+                      onChange={(e) => setFilterRaspberry(e.target.value)}
+                      placeholder="ex: rpi-01"
+                      className="mt-1 w-full bg-black/40 border border-white/10 rounded px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-white/60">Hôte/IP (contient)</label>
+                    <input
+                      value={filterHost}
+                      onChange={(e) => setFilterHost(e.target.value)}
+                      placeholder="ex: hostname ou 192.168"
+                      className="mt-1 w-full bg-black/40 border border-white/10 rounded px-3 py-2 text-sm"
+                    />
+                  </div>
+                </div>
+              )}
               <div className="max-h-[75vh] overflow-auto">
                 <table className="w-full text-left text-sm">
-                  <thead className="sticky top-0 bg-white/10 text-white/70">
+                  <thead className="sticky top-0 bg-yellow-600 text-white">
                     <tr>
                       <th className="px-4 py-2">Date</th>
                       <th className="px-4 py-2">Raspberry</th>
@@ -284,7 +394,7 @@ export default function Dashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/10">
-                    {items
+                    {filteredItems
                       .slice()
                       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
                       .map((m) => (
