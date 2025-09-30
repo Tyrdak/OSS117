@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import InteractiveMap from '../../src/app/components/interactiveMap'
 
 // Mock global window for client detection
