@@ -63,6 +63,20 @@ export default function Dashboard() {
     fetchItems()
   }, [])
 
+  // Realtime: recharge automatiquement à chaque nouvelle insertion dans la table "motions"
+  useEffect(() => {
+    const channel = supabase
+      .channel('realtime-motions')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'motions' }, () => {
+        fetchItems()
+      })
+      .subscribe()
+
+    return () => {
+      try { channel.unsubscribe() } catch {}
+    }
+  }, [])
+
   // Récupère la liste des raspberries (dernier IP connu)
   const raspberries = useMemo(() => {
     const latestByRpi = new Map<string, MotionEvent>()
@@ -132,11 +146,15 @@ export default function Dashboard() {
         if (isFinite(lat as number) && isFinite(lon as number)) {
           setLocCoords({ lat: lat as number, lon: lon as number })
         } else {
-          setProbeError('Impossible de lire les coordonnées renvoyées')
+          setProbeError('Pas de signal')
         }
       }
     } catch (e: unknown) {
-      setProbeError(e instanceof Error ? e.message : String(e))
+      let errorMsg = 'Pas de signal'
+      if (e instanceof Error && !e.message.toLowerCase().includes('fetch')) {
+        errorMsg = e.message
+      }
+      setProbeError(errorMsg)
     } finally {
       setProbeLoading(false)
     }
@@ -193,13 +211,6 @@ export default function Dashboard() {
           <h1 className="text-xl tracking-widest">QG <span className='text-yellow-600'>SECRET</span></h1>
           <div className="flex items-center gap-3 text-xs text-white/60">
             {lastUpdated && <span>Maj: {lastUpdated.toLocaleTimeString()}</span>}
-            <button
-              onClick={fetchItems}
-              disabled={loading}
-              className={`px-3 py-1 rounded border border-white/20 ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white/10'}`}
-            >
-              {loading ? 'Chargement…' : 'Rafraîchir'}
-            </button>
           </div>
         </header>
 

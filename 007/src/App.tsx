@@ -15,6 +15,13 @@ function resolveRoute(): Route {
 
 function App() {
   const [route, setRoute] = useState<Route>(resolveRoute());
+  const [martiniSolved, setMartiniSolved] = useState<boolean>(() => {
+    try { 
+      return localStorage.getItem('glass-filled') === 'true' 
+    } catch { 
+      return false 
+    }
+  });
 
   useEffect(() => {
     const onHashChange = () => setRoute(resolveRoute());
@@ -22,9 +29,32 @@ function App() {
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
+  useEffect(() => {
+    const onGlassFilled = () => setMartiniSolved(true);
+    const onGlassEmptied = () => setMartiniSolved(false);
+    
+    window.addEventListener('glass:filled', onGlassFilled);
+    window.addEventListener('glass:emptied', onGlassEmptied);
+    
+    return () => {
+      window.removeEventListener('glass:filled', onGlassFilled);
+      window.removeEventListener('glass:emptied', onGlassEmptied);
+    };
+  }, []);
+
+  // Bloquer l'accès au dashboard si l'énigme n'est pas résolue
+  const shouldShowDashboard = route === 'control' && martiniSolved;
+  const shouldRedirectToHome = route === 'control' && !martiniSolved;
+
+  useEffect(() => {
+    if (shouldRedirectToHome) {
+      window.location.hash = '#home';
+    }
+  }, [shouldRedirectToHome]);
+
   return (
     <>
-      {route === 'control' ? <Dashboard /> : <Landing />}
+      {shouldShowDashboard ? <Dashboard /> : <Landing />}
       <DraggableOlive />
       <DraggableBottle />
     </>
